@@ -30,3 +30,8 @@ moneypenny:
           runAsUser: 1000
           runAsNonRootUser: true
           allowPrivilegeEscalation: false
+    volumes:
+      - name: homedirs
+        nfs:
+          server: 192.168.0.20
+          path: /jhome

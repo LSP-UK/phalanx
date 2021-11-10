@@ -1,7 +1,7 @@
 cadc-tap:
   pull_secret: 'pull-secret'
-  use_mock_qserv: true
-
+  use_mock_qserv: false
+  qserv_host: "192.41.108.25:30040"
   host: "rsp.lsst.ac.uk"
 
   secrets:

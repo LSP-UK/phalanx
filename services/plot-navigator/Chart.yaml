@@ -1,7 +1,7 @@
 apiVersion: v2
-name: moneypenny
-version: 0.1.1
+name: plot-navigator
+version: 1.0.0
 dependencies:
-- name: moneypenny
-  version: 0.1.2
+- name: plot-navigator
+  version: "=1.5.8"
   repository: https://lsst-sqre.github.io/charts/

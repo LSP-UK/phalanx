@@ -1,4 +1,6 @@
 gafaelfawr:
+  replicaCount: 2
+
   imagePullSecrets:
     - name: "pull-secret"
   ingress:
@@ -35,6 +37,12 @@ gafaelfawr:
         - "rubin-dp0-delegates"
         - "rubin-dp0-friends"
       "exec:portal":
+        - "lsst-sqre-square"
+        - "lsst-data-management"
+        - "lsst-ops"
+        - "rubin-dp0-delegates"
+        - "rubin-dp0-friends"
+      "read:image":
         - "lsst-sqre-square"
         - "lsst-data-management"
         - "lsst-ops"

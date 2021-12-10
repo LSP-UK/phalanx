@@ -36,6 +36,8 @@ nublado2:
   enabled: true
 obstap:
   enabled: true
+plot_navigator:
+  enabled: true
 portal:
   enabled: true
 postgres:
@@ -50,9 +52,13 @@ squash_api:
   enabled: false
 strimzi:
   enabled: true
+strimzi_registry_operator:
+  enabled: true
 tap:
   enabled: true
 tap_schema:
   enabled: true
 vault_secrets_operator:
+  enabled: true
+vo_cutouts:
   enabled: true

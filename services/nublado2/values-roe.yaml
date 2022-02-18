@@ -18,28 +18,20 @@ nublado2:
       - image_url: registry.hub.docker.com/lsstsqre/sciplat-lab:recommended
         name: Recommended
     volumes:
-      - name: datasets
-        hostPath:
-          path: /lsstdata/user/precursor_data/datasets
+      - name: data
+        nfs:
+          path: /data
+          server: 192.168.0.20
       - name: home
-        hostPath:
-          path: /lsstdata/user/staff/jhome
-      - name: project
-        hostPath:
-          path: /lsstdata/user/staff/project
-      - name: scratch
-        hostPath:
-          path: /lsstdata/user/staff/scratch
+        nfs:
+          path: /jhome
+          server: 192.168.0.20
     volume_mounts:
-      - name: datasets
-        mountPath: /datasets
+      - name: data
+        mountPath: /data
       - name: home
         mountPath: /home
-      - name: project
-        mountPath: /project
-      - name: scratch
-        mountPath: /scratch
-
+        
   vault_secret_path: "secret/k8s_operator/roe/nublado2"
 
 pull-secret:

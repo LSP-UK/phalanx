@@ -1,5 +1,8 @@
 cadc-tap:
   fullnameOverride: "cadc-tap"
+  use_mock_qserv: false
+  qserv_host: "192.41.108.25:30040"
+  host: "rsp.lsst.ac.uk"
 
   imagePullSecrets:
     - name: "pull-secret"

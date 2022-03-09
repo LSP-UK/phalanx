@@ -15,7 +15,7 @@ cert_manager:
 chronograf:
   enabled: false
 datalinker:
-  enabled: true
+  enabled: false
 exposurelog:
   enabled: false
 gafaelfawr:
@@ -29,7 +29,7 @@ mobu:
 moneypenny:
   enabled: true
 ingress_nginx:
-  enabled: true
+  enabled: false
 noteburst:
   enabled: true
 nublado2:

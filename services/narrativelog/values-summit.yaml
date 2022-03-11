@@ -1,0 +1,14 @@
+narrativelog:
+  imagePullSecrets:
+    - name: pull-secret
+  ingress:
+    enabled: true
+    host: summit-lsp.lsst.codes
+
+  site_id: summit
+
+vault_path: secret/k8s_operator/summit-lsp.lsst.codes/postgres
+
+pull-secret:
+  enabled: true
+  path: secret/k8s_operator/summit-lsp.lsst.codes/pull-secret

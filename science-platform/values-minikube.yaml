@@ -4,26 +4,18 @@ vault_path_prefix: secret/k8s_operator/minikube.lsst.codes
 
 alert_stream_broker:
   enabled: false
-argo:
-  enabled: true
 cachemachine:
   enabled: true
 cert_issuer:
   enabled: false
 cert_manager:
   enabled: true
-chronograf:
-  enabled: false
 datalinker:
-  enabled: false
+  enabled: true
 exposurelog:
   enabled: false
 gafaelfawr:
   enabled: true
-influxdb:
-  enabled: false
-kapacitor:
-  enabled: false
 mobu:
   enabled: true
 moneypenny:
@@ -41,8 +33,6 @@ plot_navigator:
 portal:
   enabled: true
 postgres:
-  enabled: true
-rancher_external_ip_webhook:
   enabled: true
 semaphore:
   enabled: true

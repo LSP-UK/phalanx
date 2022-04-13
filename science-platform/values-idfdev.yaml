@@ -6,8 +6,6 @@ alert_stream_broker:
   enabled: false
 cachemachine:
   enabled: true
-cert_issuer:
-  enabled: true
 cert_manager:
   enabled: true
 datalinker:
@@ -47,12 +45,18 @@ squareone:
 squash_api:
   enabled: false
 strimzi:
-  enabled: false
+  enabled: true
 strimzi_registry_operator:
   enabled: false
 tap:
   enabled: true
 tap_schema:
+  enabled: true
+telegraf:
+  enabled: true
+telegraf-ds:
+  enabled: true
+times_square:
   enabled: true
 vault_secrets_operator:
   enabled: true

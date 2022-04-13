@@ -52,6 +52,8 @@ class SecretGenerator:
         self._argocd()
         self._portal()
         self._vo_cutouts()
+        self._telegraf()
+        self._sherlock()
 
         self.input_field("cert-manager", "enabled", "Use cert-manager? (y/n):")
         use_cert_manager = self.secrets["cert-manager"]["enabled"]
@@ -138,7 +140,8 @@ class SecretGenerator:
         self._set_generated("postgres", "gafaelfawr_password", secrets.token_hex(32))
         self._set_generated("postgres", "jupyterhub_password", secrets.token_hex(32))
         self._set_generated("postgres", "root_password", secrets.token_hex(64))
-        self._set_generated("postgres", "vo-cutouts_password", secrets.token_hex(32))
+        self._set_generated("postgres", "vo_cutouts_password", secrets.token_hex(32))
+        self._set_generated("postgres", "narrativelog_password", secrets.token_hex(32))
 
     def _nublado2(self):
         crypto_key = secrets.token_hex(32)
@@ -250,6 +253,14 @@ class SecretGenerator:
 
         self._set_generated("argocd", "server.secretkey", secrets.token_hex(16))
 
+    def _telegraf(self):
+        self.input_field(
+            "telegraf",
+            "influx-token",
+            "Token for communicating with monitoring InfluxDB2 instance",
+        )
+        self._set("telegraf", "org-id", "square")
+
     def _portal(self):
         pw = secrets.token_hex(32)
         self._set_generated("portal", "ADMIN_PASSWORD", pw)
@@ -274,6 +285,11 @@ class SecretGenerator:
         self._set("vo-cutouts", "google-credentials", google)
         postgres = self.secrets["butler-secret"]["postgres-credentials.txt"]
         self._set("vo-cutouts", "postgres-credentials", postgres)
+
+    def _sherlock(self):
+        """This secret is for sherlock to push status to status.lsst.codes."""
+        publish_key = secrets.token_hex(32)
+        self._set_generated("sherlock", "publish_key", publish_key)
 
 
 class OnePasswordSecretGenerator(SecretGenerator):

@@ -11,6 +11,7 @@ SQuaRE telemetry data service.
 | https://helm.influxdata.com/ | chronograf | 1.2.3 |
 | https://helm.influxdata.com/ | influxdb | 4.10.6 |
 | https://helm.influxdata.com/ | kapacitor | 1.4.3 |
+| https://helm.influxdata.com/ | telegraf | 1.8.14 |
 | https://lsst-sqre.github.io/charts/ | strimzi-registry-operator | 1.2.0 |
 
 ## Values
@@ -22,7 +23,7 @@ SQuaRE telemetry data service.
 | chronograf.image | object | `{"repository":"quay.io/influxdb/chronograf","tag":"1.9.3"}` | Chronograf image tag. |
 | chronograf.ingress | object | disabled | Chronograf ingress configuration. |
 | chronograf.persistence | object | `{"enabled":true,"size":"16Gi"}` | Chronograf data persistence configuration. |
-| influxdb.config | object | `{"continuous_queries":{"enabled":false},"coordinator":{"log_queries_after":"15s","max_concurrent_queries":10,"query_timeout":"900s","write_timeout":"60s"},"data":{"cache_max_memory_size":0,"trace_logging_enabled":true,"wal_fsync_delay":"100ms"},"http":{"auth_enabled":true,"enabled":true,"max_row_limit":0}}` | Override InfluxDB configuration. See https://docs.influxdata.com/influxdb/v1.8/administration/config |
+| influxdb.config | object | `{"continuous_queries":{"enabled":false},"coordinator":{"log-queries-after":"15s","max-concurrent-queries":10,"query-timeout":"900s","write-timeout":"60s"},"data":{"cache-max-memory-size":0,"trace-logging-enabled":true,"wal-fsync-delay":"100ms"},"http":{"auth-enabled":true,"enabled":true,"flux-enabled":true,"max-row-limit":0}}` | Override InfluxDB configuration. See https://docs.influxdata.com/influxdb/v1.8/administration/config |
 | influxdb.image | object | `{"tag":"1.8.10"}` | InfluxDB image tag. |
 | influxdb.ingress | object | disabled | InfluxDB ingress configuration. |
 | influxdb.initScripts | object | `{"enabled":true,"scripts":{"init.iql":"CREATE DATABASE \"telegraf\" WITH DURATION 30d REPLICATION 1 NAME \"rp_30d\"\n\n"}}` | InfluxDB Custom initialization scripts. |
@@ -35,6 +36,12 @@ SQuaRE telemetry data service.
 | kapacitor.persistence | object | `{"enabled":true,"size":"16Gi"}` | Chronograf data persistence configuration. |
 | strimzi-kafka | object | `{}` | Override strimzi-kafka configuration. |
 | strimzi-registry-operator | object | `{"clusterName":"sasquatch","operatorNamespace":"sasquatch","watchNamespace":"sasquatch"}` | strimzi-registry-operator configuration. |
+| telegraf.config.inputs | list | `[{"prometheus":{"metric_version":2,"urls":["http://hub.nublado2:8081/nb/hub/metrics"]}}]` | Telegraf input plugins. Collect JupyterHub Prometheus metrics by dedault. See https://jupyterhub.readthedocs.io/en/stable/reference/metrics.html |
+| telegraf.config.outputs | list | `[{"influxdb":{"database":"telegraf","password":"$TELEGRAF_PASSWORD","urls":["http://sasquatch-influxdb.sasquatch:8086"],"username":"telegraf"}}]` | Telegraf default output destination. |
+| telegraf.config.processors | object | `{}` | Telegraf processor plugins. |
+| telegraf.env[0] | object | `{"name":"TELEGRAF_PASSWORD","valueFrom":{"secretKeyRef":{"key":"telegraf-password","name":"sasquatch"}}}` | Telegraf password. |
+| telegraf.podLabels | object | `{"hub.jupyter.org/network-access-hub":"true"}` | Allow network access to JupyterHub pod. |
+| telegraf.service.enabled | bool | `false` | Telegraf service. |
 | vaultSecretsPath | string | None, must be set | Path to the Vault secrets (`secret/k8s_operator/<hostname>/sasquatch`) |
 
 ----------------------------------------------

@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: yaml-lint
         uses: ibiqlik/action-yamllint@master
@@ -23,12 +23,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
 
@@ -39,7 +39,7 @@ jobs:
         run: tests/expand-services
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.2.0
+        uses: helm/chart-testing-action@v2.2.1
 
       - name: Run chart-testing (lint)
         run: ct lint --all --config ct.yaml
@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Filter paths
         uses: dorny/paths-filter@v2
@@ -96,6 +96,7 @@ jobs:
           sudo pip install -r installer/requirements.txt
 
       - name: Run installer
+        timeout-minutes: 30
         if: steps.filter.outputs.minikube == 'true'
         run: |
           cd installer

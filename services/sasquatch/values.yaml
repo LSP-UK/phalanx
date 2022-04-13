@@ -31,18 +31,19 @@ influxdb:
   # See https://docs.influxdata.com/influxdb/v1.8/administration/config
   config:
     data:
-      cache_max_memory_size: 0
-      wal_fsync_delay: "100ms"
-      trace_logging_enabled: true
+      cache-max-memory-size: 0
+      wal-fsync-delay: "100ms"
+      trace-logging-enabled: true
     http:
       enabled: true
-      auth_enabled: true
-      max_row_limit: 0
+      flux-enabled: true
+      auth-enabled: true
+      max-row-limit: 0
     coordinator:
-      write_timeout: "60s"
-      max_concurrent_queries: 10
-      query_timeout: "900s"
-      log_queries_after: "15s"
+      write-timeout: "60s"
+      max-concurrent-queries: 10
+      query-timeout: "900s"
+      log-queries-after: "15s"
     continuous_queries:
       enabled: false
   # -- InfluxDB Custom initialization scripts.
@@ -59,7 +60,7 @@ chronograf:
   # -- Chronograf image tag.
   image:
     repository: "quay.io/influxdb/chronograf"
-    tag: 1.9.3
+    tag: 1.9.4
   # -- Chronograf data persistence configuration.
   persistence:
     enabled: true
@@ -85,7 +86,7 @@ kapacitor:
   # -- Kapacitor image tag.
   image:
     repository: kapacitor
-    tag: 1.6.3
+    tag: 1.6.4
   # -- Chronograf data persistence configuration.
   persistence:
     enabled: true
@@ -97,6 +98,41 @@ kapacitor:
   # -- Kapacitor environment variables.
   envVars:
     KAPACITOR_SLACK_ENABLED: true
+
+telegraf:
+  # -- Allow network access to JupyterHub pod.
+  podLabels:
+    hub.jupyter.org/network-access-hub: "true"
+  env:
+    # -- Telegraf password.
+    - name: TELEGRAF_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: sasquatch
+          key: telegraf-password
+  service:
+    # -- Telegraf service.
+    enabled: false
+  config:
+    # -- Telegraf processor plugins.
+    processors: {}
+    # -- Telegraf input plugins.
+    # Collect JupyterHub Prometheus metrics by dedault.
+    # See https://jupyterhub.readthedocs.io/en/stable/reference/metrics.html
+    inputs:
+      - prometheus:
+          urls:
+            - http://hub.nublado2:8081/nb/hub/metrics
+          # See https://docs.influxdata.com/influxdb/v2.1/reference/prometheus-metrics/
+          metric_version: 2
+    # -- Telegraf default output destination.
+    outputs:
+      - influxdb:
+          urls:
+            - "http://sasquatch-influxdb.sasquatch:8086"
+          database: "telegraf"
+          username: "telegraf"
+          password: "$TELEGRAF_PASSWORD"
 
 # -- Path to the Vault secrets (`secret/k8s_operator/<hostname>/sasquatch`)
 # @default -- None, must be set

@@ -5,10 +5,6 @@ vo-cutouts:
     host: "data-int.lsst.cloud"
   vaultSecretsPath: "secret/k8s_operator/data-int.lsst.cloud/vo-cutouts"
 
-  image:
-    pullPolicy: "Always"
-    tag: "tickets-DM-33513"
-
   config:
     butlerRepository: "s3://butler-us-central1-panda-dev/dc2/butler-external.yaml"
     databaseUrl: "postgresql://vo-cutouts@localhost/vo-cutouts"

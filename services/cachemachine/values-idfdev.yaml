@@ -1,39 +1,35 @@
-cachemachine:
-  imagePullSecrets:
-    - name: "cachemachine-secret"
+ingress:
+  enabled: true
+  host: "data-dev.lsst.cloud"
 
-  ingress:
-    enabled: true
-    host: "data-dev.lsst.cloud"
+vaultSecretsPath: "secret/k8s_operator/data-dev.lsst.cloud/pull-secret"
 
-  vaultSecretsPath: "secret/k8s_operator/data-dev.lsst.cloud/pull-secret"
-
-  autostart:
-    jupyter: |
-      {
-        "name": "jupyter",
-        "labels": {},
-        "repomen": [
-          {
-            "type": "SimpleRepoMan",
-            "images": [
-              {
-                "image_url": "us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab:exp_w_2022_06_pdf",
-                "name": "Experimental Weekly 2022_06 (PDF)"
-              },
-              {
-                "image_url": "us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab:exp_w_2022_06_tickets-DM-33448",
-                "name": "Experimental Weekly 2022_06 (tickets/DM-33448)"
-              },
-              {
-                "image_url": "us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab:exp_w_2022_05_shallowclone",
-                "name": "Experimental Weekly 2022_05 (shallowclone)"
-              },
-              {
-                "image_url": "us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab:exp_w_2022_04_mamba",
-                "name": "Experimental Weekly 2022_04 (mamba)"
-              }
-            ]
-          }
-        ]
-      }
+autostart:
+  jupyter: |
+    {
+      "name": "jupyter",
+      "labels": {},
+      "repomen": [
+        {
+          "type": "RubinRepoGar",
+          "registry_url": "us-central1-docker.pkg.dev",
+          "gar_repository": "sciplat",
+          "gar_image": "sciplat-lab",
+          "project_id": "rubin-shared-services-71ec",
+          "location": "us-central1",
+          "recommended_tag": "recommended",
+          "num_releases": 1,
+          "num_weeklies": 2,
+          "num_dailies": 3
+        },
+        {
+          "type": "SimpleRepoMan",
+          "images": [
+            {
+              "image_url": "us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab:w_2021_49",
+              "name": "Weekly 2021_49"
+            }
+          ]
+        }
+      ]
+    }

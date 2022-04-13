@@ -1,13 +1,11 @@
 environment: int
 fqdn: lsst-lsp-int.ncsa.illinois.edu
-vault_path_prefix: secret/k8s_operator/lsst-lsp-int.lsst.codes
+vault_path_prefix: secret/k8s_operator/lsst-lsp-int.ncsa.illinois.edu
 
 alert_stream_broker:
   enabled: false
 cachemachine:
   enabled: true
-cert_issuer:
-  enabled: false
 cert_manager:
   enabled: false
 datalinker:
@@ -37,7 +35,7 @@ portal:
 postgres:
   enabled: true
 sasquatch:
-  enabled: false
+  enabled: true
 semaphore:
   enabled: false
 sherlock:
@@ -47,13 +45,19 @@ squareone:
 squash_api:
   enabled: false
 strimzi:
-  enabled: false
+  enabled: true
 strimzi_registry_operator:
   enabled: false
 tap:
   enabled: true
 tap_schema:
   enabled: true
+telegraf:
+  enabled: true
+telegraf-ds:
+  enabled: true
+times_square:
+  enabled: false
 vault_secrets_operator:
   enabled: true
 vo_cutouts:

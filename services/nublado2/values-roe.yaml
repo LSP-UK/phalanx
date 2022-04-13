@@ -31,7 +31,8 @@ jupyterhub:
       - name: home
         mountPath: /home
         
-  vault_secret_path: "secret/k8s_operator/roe/nublado2"
+
+vault_secret_path: "secret/k8s_operator/roe/nublado2"
 
 pull-secret:
   enabled: true

@@ -1,0 +1,24 @@
+# -- Path to the Vault secrets (`secret/k8s_operator/<hostname>/telegraf`)
+# shared with telegraf (non-DaemonSet)
+# @default -- None, must be set
+vaultSecretsPath: ""
+telegraf-ds:
+  env:
+    # -- Token to communicate with Influx
+    - name: INFLUX_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: telegraf
+          key: influx-token
+  override_config:
+    toml: |+
+      [global_tags]
+        cluster = "no_endpoint"
+      [agent]
+        hostname = "telegraf-$HOSTIP"
+      [[inputs.kubernetes]]
+        url = "https://$HOSTIP:10250"
+        bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+        insecure_skip_verify = true
+        namepass = ["kubernetes_pod_container"]
+        fieldpass = ["cpu_usage_nanocores", "memory_usage_bytes"]

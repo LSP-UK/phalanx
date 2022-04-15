@@ -51,6 +51,9 @@ class SecretGenerator:
         self._gafaelfawr()
         self._argocd()
         self._portal()
+        self._vo_cutouts()
+        self._telegraf()
+        self._sherlock()
 
         self.input_field("cert-manager", "enabled", "Use cert-manager? (y/n):")
         use_cert_manager = self.secrets["cert-manager"]["enabled"]
@@ -137,6 +140,8 @@ class SecretGenerator:
         self._set_generated("postgres", "gafaelfawr_password", secrets.token_hex(32))
         self._set_generated("postgres", "jupyterhub_password", secrets.token_hex(32))
         self._set_generated("postgres", "root_password", secrets.token_hex(64))
+        self._set_generated("postgres", "vo_cutouts_password", secrets.token_hex(32))
+        self._set_generated("postgres", "narrativelog_password", secrets.token_hex(32))
 
     def _nublado2(self):
         crypto_key = secrets.token_hex(32)
@@ -215,6 +220,9 @@ class SecretGenerator:
             "butler-secret", "aws-credentials.ini", "AWS credentials for butler"
             )
         self.input_file(
+            "butler-secret", "butler-gcs-idf-creds.json", "Google credentials for butler"
+            )
+        self.input_file(
             "butler-secret", "postgres-credentials.txt", "Postgres credentials for butler"
             )
 
@@ -245,9 +253,43 @@ class SecretGenerator:
 
         self._set_generated("argocd", "server.secretkey", secrets.token_hex(16))
 
+    def _telegraf(self):
+        self.input_field(
+            "telegraf",
+            "influx-token",
+            "Token for communicating with monitoring InfluxDB2 instance",
+        )
+        self._set("telegraf", "org-id", "square")
+
     def _portal(self):
         pw = secrets.token_hex(32)
         self._set_generated("portal", "ADMIN_PASSWORD", pw)
+
+    def _vo_cutouts(self):
+        self._set_generated("vo-cutouts", "redis-password", os.urandom(32).hex())
+
+        self.input_field("vo-cutouts", "cloudsql", "Use CloudSQL? (y/n):")
+        use_cloudsql = self.secrets["vo-cutouts"]["cloudsql"]
+        if use_cloudsql == "y":
+            self.input_field("vo-cutouts", "database-password", "Database password")
+        elif use_cloudsql == "n":
+            # Pluck the password out of the postgres portion.
+            db_pass = self.secrets["postgres"]["vo_cutouts_password"]
+            self._set("vo-cutouts", "database-password", db_pass)
+        else:
+            raise Exception(f"Invalid vo-cutouts cloudsql value {use_cloudsql}")
+
+        aws = self.secrets["butler-secret"]["aws-credentials.ini"]
+        self._set("vo-cutouts", "aws-credentials", aws)
+        google = self.secrets["butler-secret"]["butler-gcs-idf-creds.json"]
+        self._set("vo-cutouts", "google-credentials", google)
+        postgres = self.secrets["butler-secret"]["postgres-credentials.txt"]
+        self._set("vo-cutouts", "postgres-credentials", postgres)
+
+    def _sherlock(self):
+        """This secret is for sherlock to push status to status.lsst.codes."""
+        publish_key = secrets.token_hex(32)
+        self._set_generated("sherlock", "publish_key", publish_key)
 
 
 class OnePasswordSecretGenerator(SecretGenerator):
@@ -356,31 +398,23 @@ class OnePasswordSecretGenerator(SecretGenerator):
 
         This method first runs `SecretGenerator.generate`, and then
         automatically generates secrets for any additional components
-        that were identified in 1Password, but do not have a file in the
-        secrets directory yet.
+        that were identified in 1Password.
+
+        If a secret appears already, it is overridden with the value in
+        1Password.
         """
         super().generate()
 
-        components_in_op = set([k.split()[0] for k in self.op_secrets.keys()])
-        existing_components = set(self.secrets.keys())
-        # Add components that may not be present in every environment,
-        # but nonetheless might be 1Password secrets (see conditional
-        # in SecretGenerator.generate)
-        existing_components.update({"ingress-nginx", "cert-manager"})
+        for composite_key, secret_value in self.op_secrets.items():
+            item_component, item_name = composite_key.split()
+            # Special case for components that may not be present in every
+            # environment, but nonetheless might be 1Password secrets (see
+            # conditional in SecretGenerator.generate)
+            if item_component in {"ingress-nginx", "cert-manager"}:
+                continue
 
-        new_components = components_in_op - existing_components
-        logging.debug("New components: %s", new_components)
-        for component_name in new_components:
-            self._generate_new_op_component(component_name)
-
-    def _generate_new_op_component(self, component_name):
-        """Generate an entry in the `secrets` attribute for a new component
-        found in 1Password.
-        """
-        for secret_key in self.op_secrets.keys():
-            item_component, item_name = secret_key.split()
-            if item_component == component_name:
-                self.input_field(component_name, item_name, "")
+            logging.debug("Updating component: %s/%s", item_component, item_name)
+            self.input_field(item_component, item_name, "")
 
 
 if __name__ == "__main__":

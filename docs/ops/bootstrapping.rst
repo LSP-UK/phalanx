@@ -4,13 +4,22 @@ Bootstrapping a new deployment
 
 This is (somewhat incomplete) documentation on how to add a new Rubin Science Platform environment.
 
+Requirements
+============
+
+* The installer assumes Git 2.22 or later.
+
+* We presume that you are using `Vault <https://www.vaultproject.io/>`__ coupled with `Vault Secrets Operator <https://github.com/ricoberger/vault-secrets-operator>`__ to manage your Kubernetes secrets, and further that you will use the same taxonomy that SQuaRE does as described in the `LSST Vault Utilities <https://github.com/lsst-sqre/lsstvaultutils#secrets>`__ documentation (essentially ``secret/k8s_operator/<instance-name>``).
+  We strongly recommend using the `LSST Vault Utilites <https://github.com/lsst-sqre/lsstvaultutils/>`__ to create multiple enclaves (one per instance), so that then compromise of one instance doesn't expose all your secrets for all instances.
+
+* Rubin Science Platform applications expect the public hostname of the Science Platform to have a TLS certificate that can be verified using standard CA roots.
+  Using a self-signed certificate or an institutional CA that is not in the normal list of CAs shipped with Docker base images will probably not work.
+  See :ref:`hostnames` for more information.
+
 Checklist
 =========
 
 #. Fork the `phalanx repository <https://github.com/lsst-sqre/phalanx>`__ if this work is separate from the SQuaRE-managed environments.
-
-#. We presume that you are using `Vault <https://www.vaultproject.io/>`__ coupled with `Vault Secrets Operator <https://github.com/ricoberger/vault-secrets-operator>`__ to manage your Kubernetes secrets, and further that you will use the same taxonomy that SQuaRE does as described in the `LSST Vault Utilities <https://github.com/lsst-sqre/lsstvaultutils#secrets>`__ documentation (essentially ``secret/k8s_operator/<instance-name>``).
-   We strongly recommend using the LSST Vault Utilites to create multiple enclaves (one per instance), so that then compromise of one instance doesn't expose all your secrets for all instances.
 
 #. Create a virtual environment with the tools you will need from the installer's `requirements.txt <https://github.com/lsst-sqre/phalanx/tree/master/installer/requirements.txt>`__.
    If you are not using 1password as your source of truth (which, if you are not in a SQuaRE-managed environment, you probably are not) then you may omit ``1password``.
@@ -28,37 +37,13 @@ Checklist
    If you are using a cloud provider or something like minikube where the IP address is not yet known, then you will need to create that record once the top-level ingress is created and has an external IP address.
 
    The first time you set up the RSP for a given domain (note: *not* hostname, but *domain*, so if you were setting up ``dev.my-rsp.net`` and ``prod.my-rsp.net``, ``dev`` first, you would only need to do this when you created ``dev``), if you are using Let's Encrypt for certificate management (which we highly recommend), you will need to create glue records to enable Let's Encrypt to manage TLS for the domain.
-   See :doc:`cert-issuer/route53-setup` for more details.
+   See :doc:`cert-manager/route53-setup` for more details.
 
 #. For each enabled service, create a corresponding ``values-<environment>.yaml`` file in the relevant directory under `/services <https://github.com/lsst-sqre/phalanx/tree/master/services/>`__.
    Customization will vary from service to service, but the most common change required is to set the fully-qualified domain name of the environment to the one that will be used for your new deployment.
    This will be needed in ingress hostnames, NGINX authentication annotations, and the paths to Vault secrets (the part after ``k8s_operator`` should be the same fully-qualified domain name).
-   A few more items of particular interest:
 
-   #. Moneypenny and Nublado2 both need to know where the NFS server that provides user home space is, and Nublado2 requires additional persistent storage space as well.
-      Ensure that the correct definitions are in place in both of those configurations.
-
-   #. If the Firefly portal has a replicaCount greater than one, it is imperative that ``firefly_shared_workdir`` be set and that it reside on an underlying filesystem that supports shared multiple-write.
-      At GKE, this is currently Filestore (therefore NFS), and at NCSA, it is currently a hostPath mount to underlying GPFS.
-      Currently the provisioning of this underlying backing store is manual, so make sure you either have created it, or gotten a system administrator with appropriate permissions for your site to do so.
-      The default UID for Firefly is 91, although it is tunable in the deployment if need be.
-
-   #. For T&S sites that require instrument control, make sure you have any Multus network definitions you need in the nublado2 values.
-      This will look something like:
-
-      .. code-block:: yaml
-
-          singleuser:
-            extraAnnotations:
-              k8s.v1.cni.cncf.io/networks: "kube-system/auxtel-dds, kube-system/comcam-dds, kube-system/misc-dds"
-            initContainers:
-              - name: "multus-init"
-                image: "lsstit/ddsnet4u:latest"
-                securityContext:
-                  privileged: true
-
-      Specifically, the Multus network names are given as an annotation string, where the networks are separated by commas, and experimentally it appears that the interfaces will appear in the order specified.
-      The ``initContainers`` entry should simply be inserted verbatim: it creates a privileged container that bridges user pods to the specified networks before releasing control to the user's Lab.
+   See :ref:`service-notes` for more details on special considerations for individual services.
 
 #. Generate the secrets for the new environment with `/installer/generate_secrets.py <https://github.com/lsst-sqre/phalanx/tree/master/installer/generate_secrets.py>`__ and store them in Vault with `/installer/push_secrets.sh <https://github.com/lsst-sqre/phalanx/tree/master/installer/push_secrets.sh>`__.
    This is where you will need the write key for the Vault enclave.
@@ -89,7 +74,7 @@ There are supported two mechanisms to configure that TLS certificate:
 #. Configure Let's Encrypt to obtain a certificate via the DNS solver.
    Once this is configured, TLS will be handled automatically without further human intervention.
    However, this approach is far more complex to set up and has some significant prerequisites.
-   For more information, see :doc:`cert-issuer/bootstrapping`.
+   For more information, see :doc:`cert-manager/bootstrapping`.
 
 To use the second approach, you must have the following:
 
@@ -99,6 +84,8 @@ To use the second approach, you must have the following:
   This means either registering a domain via Amazon, registering a domain elsewhere and pointing it to Amazon's Route 53 DNS servers, or creating a subdomain of an existing public domain by adding ``NS`` records to that domain for a subdomain hosted on Route 53.
 
 If neither of those requirements sound familiar, you almost certainly want to use the first option and purchase a commercial certificate.
+
+.. _service-notes:
 
 Service notes
 =============
@@ -130,6 +117,46 @@ For an example of a ``group_mapping`` configuration for GitHub authentication, s
 
 If you run into authentication problems, see :doc:`the Gafaelfawr operational documentation <gafaelfawr/index>` for debugging instructions.
 
+Nublado 2
+---------
+
+Nublado (the ``nublado2`` service) and moneypenny need to know where the NFS server that provides user home space is.
+Nublado also requires other persistent storage space.
+Ensure the correct definitions are in place in their configuration.
+
+For T&S deployments that require instrument control, make sure you have any Multus network definitions you need in the ``nublado2`` ``values.yaml``.
+This will look something like:
+
+.. code-block:: yaml
+
+    singleuser:
+      extraAnnotations:
+        k8s.v1.cni.cncf.io/networks: "kube-system/auxtel-dds, kube-system/comcam-dds, kube-system/misc-dds"
+      initContainers:
+        - name: "multus-init"
+          image: "lsstit/ddsnet4u:latest"
+          securityContext:
+            privileged: true
+
+The Multus network names are given as an annotation string containing the networks, separated by commas.
+Experimentally, it appears that the interfaces will appear in the order specified.
+
+The ``initContainers`` entry should be inserted verbatim.
+It creates a privileged container that bridges user pods to the specified networks before releasing control to the user's lab.
+
+Portal
+------
+
+If the Portal Aspect is configured with a ``replicaCount`` greater than one (recommended for production installations), ``firefly_shared_workdir`` must be set and point to an underlying filesystem that supports shared multiple-write.
+This is **not** supported by most Kubernetes persistent volume backends.
+
+At GKE, we use Filestore via NFS.
+At NCSA, we use a ``hostPath`` mount of an underlying GPFS volume.
+
+Currently the provisioning of this underlying backing store is manual, so make sure you either have created it or gotten a system administrator with appropriate permissions for your site to do so.
+
+The default UID for the Portal Aspect is 91, although it is tunable in the deployment if need be.
+
 Squareone
 ---------
 
@@ -152,7 +179,7 @@ This means adding something like the following to ``values-<environment>.yaml`` 
      ingress:
        host: "rsp.example.com"
        annotations:
-         cert-manager.io/cluster-issuer: cert-issuer-letsencrypt-dns
+         cert-manager.io/cluster-issuer: letsencrypt-dns
        tls:
          - secretName: squareone-tls
            hosts:

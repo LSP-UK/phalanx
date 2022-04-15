@@ -1,6 +1,6 @@
 tap-schema:
   pull_secret: 'pull-secret'
-  image: lsstsqre/tap-schema-idfprod
+  image: stvoutsin/tap-schema-roe
 
 pull-secret:
   enabled: true

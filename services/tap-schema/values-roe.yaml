@@ -1,2 +1,6 @@
-image: 
-  stvoutsin/tap-schema-roe
+image:
+  repository: "stvoutsin/tap-schema-roe"
+
+
+
+

@@ -1,7 +1,2 @@
-tap-schema:
-  pull_secret: 'pull-secret'
-  image: stvoutsin/tap-schema-roe
-
-pull-secret:
-  enabled: true
-  path: secret/k8s_operator/roe/pull-secret
+image: 
+  stvoutsin/tap-schema-roe

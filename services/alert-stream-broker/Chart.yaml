@@ -1,9 +1,9 @@
 apiVersion: v2
 name: alert-stream-broker
-version: "2"
+version: "3"
 dependencies:
   - name: alert-stream-broker
-    version: 2.4.0
+    version: 2.5.1
     repository: https://lsst-sqre.github.io/charts/
 
   # The schema registry is bundled together in the same application as the
@@ -20,5 +20,9 @@ dependencies:
   # namespace - and the alert-stream-simulator needs those credentials to
   # connect.
   - name: alert-stream-simulator
-    version: 1.5.0
+    version: 1.6.2
+    repository: https://lsst-sqre.github.io/charts/
+
+  - name: alert-database
+    version: 2.1.0
     repository: https://lsst-sqre.github.io/charts/

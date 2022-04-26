@@ -10,7 +10,7 @@ Vault
 Argo CD allows all service configuration to be checked into Git and deployed from that repository.
 However, many service configurations require some secrets such as random numbers, certificates, or passwords.
 These obviously cannot be committed to a public repository.
-We instead use `Vault`_ to store secrets and then materialize them in Kubernetes using ref:`vault-secrets-operator`.
+We instead use `Vault`_ to store secrets and then materialize them in Kubernetes using :ref:`vault-secrets-operator`.
 
 .. _Vault: https://www.vaultproject.io/
 
@@ -49,4 +49,5 @@ These 1Password objects are used by the `generate_secrets.py script <https://git
 Ephemeral secrets that can be reset when the environment is reinstalled are generated during the installation process.
 `update_secrets.sh <https://github.com/lsst-sqre/phalanx/blob/master/installer/update_secrets.sh>`__ uses the ``onepassword_uuid`` setting in `/science-platform/values.yaml <https://github.com/lsst-sqre/phalanx/blob/master/science-platform/values.yaml>`__ to locate the appropriate 1Password vault.
 
-For a step-by-step guide, see :doc:`/service-guide/add-a-onepassword-secret`.
+For a step-by-step guide on adding a 1Password-based secret, see :doc:`/service-guide/add-a-onepassword-secret`.
+For updating an existing 1Password-based secret, see :doc:`/service-guide/update-a-onepassword-secret`.

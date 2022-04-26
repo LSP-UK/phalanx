@@ -6,8 +6,6 @@ alert_stream_broker:
   enabled: false
 cachemachine:
   enabled: true
-cert_issuer:
-  enabled: false
 cert_manager:
   enabled: true
 datalinker:
@@ -22,6 +20,8 @@ moneypenny:
   enabled: true
 ingress_nginx:
   enabled: false
+narrativelog:
+  enabled: false
 noteburst:
   enabled: true
 nublado2:
@@ -34,7 +34,11 @@ portal:
   enabled: true
 postgres:
   enabled: true
+sasquatch:
+  enabled: false
 semaphore:
+  enabled: true
+sherlock:
   enabled: true
 squareone:
   enabled: true
@@ -48,6 +52,12 @@ tap:
   enabled: true
 tap_schema:
   enabled: true
+telegraf:
+  enabled: false
+telegraf-ds:
+  enabled: false
+times_square:
+  enabled: false
 vault_secrets_operator:
   enabled: true
 vo_cutouts:

@@ -1,0 +1,18 @@
+telegraf:
+  config:
+    agent:
+      omit_hostname: true
+    global_tags:
+      cluster: ''
+  env:
+  - name: INFLUX_TOKEN
+    valueFrom:
+      secretKeyRef:
+        key: influx-token
+        name: telegraf
+  podLabels:
+    hub.jupyter.org/network-access-hub: 'true'
+  service:
+    enabled: false
+  tplVersion: 2
+vaultSecretsPath: ''

@@ -4,15 +4,9 @@ vault_path_prefix: secret/k8s_operator/squash-sandbox.lsst.codes
 
 alert_stream_broker:
   enabled: false
-argo:
-  enabled: false
 cachemachine:
   enabled: false
-cert_issuer:
-  enabled: true
 cert_manager:
-  enabled: true
-chronograf:
   enabled: true
 datalinker:
   enabled: false
@@ -20,16 +14,14 @@ exposurelog:
   enabled: false
 gafaelfawr:
   enabled: true
-influxdb:
-  enabled: true
-kapacitor:
-  enabled: true
 mobu:
   enabled: false
 moneypenny:
   enabled: false
 ingress_nginx:
   enabled: true
+narrativelog:
+  enabled: false
 noteburst:
   enabled: false
 nublado2:
@@ -42,8 +34,8 @@ portal:
   enabled: false
 postgres:
   enabled: true
-rancher_external_ip_webhook:
-  enabled: true
+sasquatch:
+  enabled: false
 semaphore:
   enabled: false
 squareone:
@@ -57,6 +49,12 @@ strimzi_registry_operator:
 tap:
   enabled: false
 tap_schema:
+  enabled: false
+telegraf:
+  enabled: false
+telegraf-ds:
+  enabled: false
+times_square:
   enabled: false
 vault_secrets_operator:
   enabled: true

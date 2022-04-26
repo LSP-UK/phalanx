@@ -34,8 +34,10 @@ General development and operations
 
    service-guide/create-service
    service-guide/add-a-onepassword-secret
+   service-guide/update-a-onepassword-secret
    service-guide/add-service
    service-guide/add-external-chart
+   service-guide/local-development
    service-guide/sync-argo-cd
    service-guide/upgrade
    service-guide/chart-changes
@@ -60,13 +62,11 @@ Services
 
    ops/argo-cd/index
    ops/cachemachine/index
-   ops/cert-issuer/index
    ops/cert-manager/index
    ops/gafaelfawr/index
    ops/ingress-nginx/index
    ops/nublado2/index
    ops/postgres/index
-   ops/rancher-external-ip-webhook/index
    ops/squash-api/index
    ops/tap/index
    ops/vault-secrets-operator/index

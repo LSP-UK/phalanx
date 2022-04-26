@@ -19,14 +19,14 @@ kubectl create secret generic vault-secrets-operator \
   --namespace vault-secrets-operator \
   --from-literal=VAULT_TOKEN=$VAULT_TOKEN \
   --from-literal=VAULT_TOKEN_LEASE_DURATION=31536000 \
-  --dry-run -o yaml | kubectl apply -f -
+  --dry-run=client -o yaml | kubectl apply -f -
 
 echo "Set up docker pull secret for vault-secrets-operator..."
 vault kv get --field=.dockerconfigjson $VAULT_PATH_PREFIX/pull-secret > docker-creds
 kubectl create secret generic pull-secret -n vault-secrets-operator \
     --from-file=.dockerconfigjson=docker-creds \
     --type=kubernetes.io/dockerconfigjson \
-    --dry-run -o yaml | kubectl apply -f -
+    --dry-run=client -o yaml | kubectl apply -f -
 
 
 echo "Update / install vault-secrets-operator..."
@@ -93,14 +93,6 @@ then
     --port-forward \
     --port-forward-namespace argocd && \
     kubectl -n cert-manager rollout status deploy/cert-manager-webhook
-fi
-
-if [ $(yq -r .cert_issuer.enabled ../science-platform/values-$ENVIRONMENT.yaml) == "true" ];
-then
-  echo "Syncing cert-issuer..."
-  argocd app sync cert-issuer \
-    --port-forward \
-    --port-forward-namespace argocd
 fi
 
 if [ $(yq -r .postgres.enabled ../science-platform/values-$ENVIRONMENT.yaml) == "true" ];

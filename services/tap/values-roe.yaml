@@ -1,14 +1,38 @@
-cadc-tap:
+  cadc-tap:
   fullnameOverride: "cadc-tap"
-  use_mock_qserv: false
-  qserv_host: "192.41.108.25:30040"
-  host: "rsp.lsst.ac.uk"
-
+  
   imagePullSecrets:
     - name: "pull-secret"
   ingress:
     host: "rsp.lsst.ac.uk"
   vaultSecretsPath: "secret/k8s_operator/roe/tap"
+
+  resources:
+    requests:
+      cpu: 2.0
+      memory: "2G"
+    limits:
+      cpu: 8.0
+      memory: "32G"
+
+  config:
+    gcsBucket: "async-results.lsst.codes"
+    gcsBucketUrl: "http://async-results.lsst.codes"
+    jvmMaxHeapSize: "31G"
+
+  qserv:
+    host: "192.41.108.25:30040"
+    mock:
+      enabled: false
+
+  uws:
+    resources:
+      requests:
+        cpu: 0.25
+        memory: "1G"
+      limits:
+        cpu: 2.0
+        memory: "4G"
 
 pull-secret:
   enabled: true
